@@ -18,6 +18,8 @@ repositories {
 }
 
 dependencies {
+	implementation 'org.springframework.boot:spring-boot-h2console'
+	runtimeOnly 'com.h2database:h2'
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:4.0.1'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'

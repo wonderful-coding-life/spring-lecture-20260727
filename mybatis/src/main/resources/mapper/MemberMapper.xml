@@ -3,11 +3,39 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.demo.mapper.MemberMapper">
-    <select id="findAll">
+    <resultMap id="memberResult" type="com.example.demo.model.Member">
+        <result column="email" property="contact"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="memberResult">
         SELECT * FROM member
     </select>
 
-    <select id="findById">
+    <select id="findAllOrderBy" resultMap="memberResult">
+        SELECT * FROM member ORDER BY ${order} ${dir}
+    </select>
+
+    <select id="findById" resultMap="memberResult">
         SELECT * FROM member WHERE id = #{id}
     </select>
+
+    <select id="findByNameLike" resultMap="memberResult">
+        SELECT * FROM member WHERE name LIKE #{name}
+    </select>
+
+    <insert id="save" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO member(name, email, age) VALUES(#{member.name}, #{member.contact}, #{member.age})
+    </insert>
+
+    <update id="update">
+        UPDATE member SET name=#{member.name}, email=#{member.contact}, age=#{member.age} WHERE id=#{member.id}
+    </update>
+
+    <update id="updateContact">
+        UPDATE member SET email=#{contact} WHERE id=#{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM member WHERE id=#{id}
+    </delete>
 </mapper>

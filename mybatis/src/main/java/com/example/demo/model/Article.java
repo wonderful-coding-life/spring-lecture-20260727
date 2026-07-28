@@ -5,13 +5,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Member {
+public class Article {
     private Long id;
-    private String name;
-    private String contact;
-    private Integer age;
+    private String title;
+    private String description;
+    private LocalDateTime created;
+    private LocalDateTime updated;
+    private Long memberId;
 }
