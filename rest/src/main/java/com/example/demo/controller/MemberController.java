@@ -1,7 +1,10 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.MemberRequest;
+import com.example.demo.dto.MemberResponse;
 import com.example.demo.entity.Member;
 import com.example.demo.repository.MemberRepository;
+import com.example.demo.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -21,21 +24,29 @@ import java.util.NoSuchElementException;
 public class MemberController {
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private MemberService memberService;
+
+//    @PostMapping("/members")
+//    @ResponseStatus(HttpStatus.CREATED)
+//    public MemberResponse postMembers(@RequestBody MemberRequest memberRequest) {
+//        return memberService.subscribe(memberRequest);
+//    }
 
     @PostMapping("/members")
     @ResponseStatus(HttpStatus.CREATED)
-    public Member postMembers(@RequestBody Member member) {
-        return memberRepository.save(member);
+    public List<MemberResponse> postMembers(@RequestBody List<MemberRequest> memberRequests) {
+        return memberService.subscribeBatch(memberRequests);
     }
 
     @GetMapping("/members")
-    public List<Member> getMembers() {
-        return memberRepository.findAll();
+    public List<MemberResponse> getMembers() {
+        return memberService.findAll();
     }
 
     @GetMapping("/members/{id}")
-    public Member getMemberById(@PathVariable("id") Long id) {
-        return memberRepository.findById(id).orElseThrow();
+    public MemberResponse getMemberById(@PathVariable("id") Long id) {
+        return memberService.findById(id);
     }
 
     @PutMapping("/members/{id}")
