@@ -27,17 +27,17 @@ public class MemberController {
     @Autowired
     private MemberService memberService;
 
-//    @PostMapping("/members")
-//    @ResponseStatus(HttpStatus.CREATED)
-//    public MemberResponse postMembers(@RequestBody MemberRequest memberRequest) {
-//        return memberService.subscribe(memberRequest);
-//    }
-
     @PostMapping("/members")
     @ResponseStatus(HttpStatus.CREATED)
-    public List<MemberResponse> postMembers(@RequestBody List<MemberRequest> memberRequests) {
-        return memberService.subscribeBatch(memberRequests);
+    public MemberResponse postMembers(@RequestBody MemberRequest memberRequest) {
+        return memberService.subscribe(memberRequest);
     }
+
+//    @PostMapping("/members")
+//    @ResponseStatus(HttpStatus.CREATED)
+//    public List<MemberResponse> postMembers(@RequestBody List<MemberRequest> memberRequests) {
+//        return memberService.subscribeBatch(memberRequests);
+//    }
 
     @GetMapping("/members")
     public List<MemberResponse> getMembers() {

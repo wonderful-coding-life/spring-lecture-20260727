@@ -7,6 +7,8 @@ import com.example.demo.entity.Member;
 import com.example.demo.repository.ArticleRepository;
 import com.example.demo.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -29,6 +31,10 @@ public class ArticleService {
                 .member(member).build();
         articleRepository.save(article);
         return mapToArticleResponse(article);
+    }
+
+    public Page<ArticleResponse> findAll(Pageable pageable) {
+        return articleRepository.findAll(pageable).map(this::mapToArticleResponse);
     }
 
     private ArticleResponse mapToArticleResponse(Article article) {
