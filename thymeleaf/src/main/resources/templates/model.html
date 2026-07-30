@@ -5,6 +5,9 @@
     <title>Title</title>
 </head>
 <body>
+
+<div th:replace="~{common::header}"></div>
+
 <div th:text="${greeting}">Hello?</div>
 <div th:text="${#temporals.format(now, 'yyyy-MM-dd HH:mm:ss')}">2026년 1월 1일 00:00:00</div>
 
@@ -15,13 +18,15 @@
 </ul>
 
 <table>
-    <tr th:each="member, iteration : ${members}" th:style="${iteration.odd}?'background-color:lightcoral':'background-color:lightgreen'"   style="background-color:lightcoral">
+    <tr th:each="member, iteration : ${members}" th:style="${iteration.odd}?'background-color:lightcoral':'background-color:lightgreen'" style="background-color:lightcoral">
         <td th:text="${iteration.count}">1</td>
         <td th:text="${member.name}">홍길동</td>
         <td th:text="${member.email}">GildongHong@hanbit.co.kr</td>
         <td th:text="${member.age}">18</td>
     </tr>
 </table>
+
+<div th:replace="~{common::footer}"></div>
 
 </body>
 </html>
