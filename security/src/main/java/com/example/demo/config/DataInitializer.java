@@ -1,10 +1,13 @@
 package com.example.demo.config;
 
+import com.example.demo.entity.Member;
 import com.example.demo.entity.Product;
+import com.example.demo.repository.MemberRepository;
 import com.example.demo.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,6 +16,8 @@ import java.util.List;
 public class DataInitializer implements ApplicationRunner {
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private MemberRepository memberRepository;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -22,6 +27,22 @@ public class DataInitializer implements ApplicationRunner {
                     Product.builder().name("맥북").price(950000).build()
             );
             productRepository.saveAll(products);
+        }
+        if (memberRepository.count() == 0) {
+            var passwordEncoder = new BCryptPasswordEncoder();
+            var members = List.of(
+                    Member.builder()
+                            .name("seojun")
+                            .password(passwordEncoder.encode("12345678"))
+                            .authorities("ROLE_USER")
+                            .build(),
+                    Member.builder()
+                            .name("kwangcheol")
+                            .password(passwordEncoder.encode("12345678"))
+                            .authorities("ROLE_USER, ROLE_ADMIN")
+                            .build()
+            );
+            memberRepository.saveAll(members);
         }
     }
 }
