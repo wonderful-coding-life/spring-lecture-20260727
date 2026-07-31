@@ -5,14 +5,20 @@ import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.document.DocumentReader;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.reader.TextReader;
+import org.springframework.ai.reader.markdown.MarkdownDocumentReader;
+import org.springframework.ai.reader.markdown.config.MarkdownDocumentReaderConfig;
+import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
+import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.VectorStoreRetriever;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.io.IOException;
 import java.util.List;
 
 @SpringBootTest
@@ -134,6 +140,57 @@ public class RagTests {
         String completion = chatClient.prompt()
                 .advisors(QuestionAnswerAdvisor.builder(vectorStore).build())
                 .user("주인공 김첨지는 어떤 일을 하는 사람인가요?")
+                .call()
+                .content();
+        log.info("\n{}", completion);
+    }
+
+    @Test
+    public void testPdfReader() throws IOException {
+        embedPdfDocument("classpath:/캠퍼스 온라인 쇼핑몰 반품 정책 매뉴얼.pdf");
+        embedPdfDocument("classpath:/캠퍼스 온라인 쇼핑몰 반품 FAQ.pdf");
+    }
+
+    private void embedPdfDocument(String path) {
+        DocumentReader reader = new PagePdfDocumentReader(path);
+        List<Document> documents = reader.read();
+        documents.forEach(document -> document.getMetadata().put("category", "pdf"));
+        TokenTextSplitter splitter = TokenTextSplitter.builder().build();
+        vectorStore.write(splitter.split(documents));
+    }
+
+    @Test
+    public void testMarkdownReader() throws IOException {
+        var config = MarkdownDocumentReaderConfig.builder()
+                .withIncludeCodeBlock(true)
+                .withIncludeBlockquote(true)
+                .withHorizontalRuleCreateDocument(true)
+                .withAdditionalMetadata("category", "markdown")
+                .build();
+
+        var reader = new MarkdownDocumentReader("classpath*:*.md", config);
+
+        List<Document> documents = reader.get();
+        vectorStore.write(documents);
+    }
+
+
+
+    @Test
+    public void testAdvisorWithOption() {
+        //String question = "제가 교제를 구매했는데, 책에 조금 필기를 했어요. 반품이 되나요? 이경우 누가 반품비를 부담하나요?";
+        String question = "쿠폰과 적립금을 사용해서 결제했는데 일부 상품만 반품하면 환불 금액은 어떻게 계산되나요?";
+        String completion = chatClient.prompt()
+                .system("당신은 캠퍼스 쇼핑몰의 고객센터 상담원이야. 친절하고 명확하며 간단하게 답변해 줘.")
+                .user(question)
+                .advisors(QuestionAnswerAdvisor.builder(vectorStore)
+                        .searchRequest(SearchRequest.builder()
+                                .query(question)
+                                .similarityThreshold(0.7)
+                                .topK(2)
+                                .filterExpression("category == 'markdown'")
+                                .build())
+                        .build())
                 .call()
                 .content();
         log.info("\n{}", completion);

@@ -290,7 +290,7 @@
     setLoading(true);
 
     try {
-      const response = await fetch(`/chats/client?id=${encodeURIComponent(conversationId)}`, {
+      const response = await fetch(`/chats/tool?id=${encodeURIComponent(conversationId)}`, {
         method: "POST",
         headers: {
           "Content-Type": "text/plain;charset=UTF-8"
