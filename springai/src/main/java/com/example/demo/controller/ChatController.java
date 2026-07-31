@@ -8,10 +8,13 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.Map;
 
@@ -74,5 +77,17 @@ public class ChatController {
                         "name", "윤서준"
                 ))
                 .call().content();
+    }
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @PostMapping(value="/chats/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> postChatsStream(@RequestBody String message) {
+        return chatClient.prompt()
+                .user(message)
+                .stream()
+                .content()
+                .map(objectMapper::writeValueAsString);
     }
 }
