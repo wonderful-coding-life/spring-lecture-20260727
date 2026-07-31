@@ -39,6 +39,7 @@ public class ChatController {
     @PostMapping("/chats/client")
     public String postChatClient(@RequestBody String message, @RequestParam("id") String id) {
         return chatClient.prompt()
+                .advisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
                 .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, id))
                 .user(message)
                 .call().content();
